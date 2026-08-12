@@ -1,3 +1,12 @@
+---
+title: MotoCar Parts Pro Elite
+emoji: 🚗
+colorFrom: indigo
+colorTo: slate
+sdk: docker
+app_port: 4000
+---
+
 # 🚗 MotoCar Parts Pro Elite
 
 Tienda de autopartes premium (carros y motos) con **doble etiquetado USD/VES**, panel de administración, **servidor propio**, **tiempo real multi-dispositivo (Socket.IO)**, persistencia en JSON y acceso desde dispositivos móviles en la misma red Wi-Fi o desde internet (desplegado en la nube).

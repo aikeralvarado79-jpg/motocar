@@ -1,7 +1,7 @@
 # ============================================================
 # MotoCar Parts Pro Elite — Dockerfile de producción
-# Construye el cliente (Vite) y ejecuta el servidor con tsx
-# (el servidor no necesita compilarse a JS).
+# Compatible con Hugging Face Spaces, Docker y Northflank.
+# Construye el cliente (Vite) y ejecuta el servidor con tsx.
 # ============================================================
 
 # ---------- Etapa 1: instalar dependencias y compilar el cliente ----------
@@ -25,7 +25,12 @@ RUN npm run build -w client
 
 # ---------- Etapa 2: imagen final ----------
 FROM node:22-alpine
+
+# Usuario standard de Hugging Face Spaces (UID 1000)
+RUN addgroup -S app && adduser -S -G app -u 1000 app
+
 ENV NODE_ENV=production
+ENV HOME=/home/app
 WORKDIR /app
 
 COPY --from=build /app/package.json ./
@@ -37,12 +42,16 @@ COPY --from=build /app/shared shared/
 COPY --from=build /app/server/src server/src/
 COPY --from=build /app/client/dist client/dist/
 
-# Volumen persistente: pedidos/stock/tasas se guardan aquí
+# Carpeta de datos persistente, accesible por todos
+RUN mkdir -p /data && chmod 777 /data
+
 ENV PORT=4000
 ENV DATA_FILE=/data/db.json
 EXPOSE 4000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s \
   CMD wget -qO- http://127.0.0.1:4000/api/health || exit 1
+
+USER app
 
 CMD ["npm", "run", "start", "-w", "server"]
