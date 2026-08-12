@@ -1,0 +1,38 @@
+# Dependencias
+node_modules/
+
+# Builds
+dist/
+build/
+
+# Datos locales del servidor
+server/data/db.json
+
+# Compilado del servidor (lo genera Docker)
+server/dist/
+
+# Entorno
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Proyectos ajenos que viven en la misma carpeta
+/kiosko-247/
+/kiosko-247-main/
+/kiosko-247.zip
+/tools/
+/dev.log
+/motocar_parts_pro_elite.tsx
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Stray JS generado por tsc
+shared/*.js

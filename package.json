@@ -1,0 +1,26 @@
+{
+  "name": "motocar-parts-pro-elite",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MotoCar Parts Pro Elite - Tienda de autopartes premium con servidor, tiempo real y soporte multi-dispositivo.",
+  "license": "MIT",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n SERVER,CLIENT -c yellow,cyan \"npm run dev -w server\" \"npm run dev -w client\"",
+    "dev:server": "npm run dev -w server",
+    "dev:client": "npm run dev -w client",
+    "build": "npm run build -w client",
+    "start": "npm run start -w server",
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w client",
+    "lan": "node scripts/lan-ip.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
