@@ -1,4 +1,5 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { TasaCalculator } from './components/calc/TasaCalculator';
 import { BottomNav } from './components/layout/BottomNav';
 import { Header } from './components/layout/Header';
 import { UpdateBanner } from './components/layout/UpdateBanner';
@@ -37,6 +38,7 @@ function Layout() {
       </main>
 
       <BottomNav />
+      <TasaCalculator />
     </div>
   );
 }

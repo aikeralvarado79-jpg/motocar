@@ -43,7 +43,7 @@ interface StoreContextValue {
   cart: CartItem[];
   cartCount: number;
   cartSubtotal: number;
-  addToCart: (product: Product) => void;
+  addToCart: (product: Product, qty?: number) => void;
   updateCartQty: (id: string, delta: number) => void;
   clearCart: () => void;
   placeOrder: (args: PlaceOrderArgs) => Promise<Order>;
@@ -157,18 +157,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [refresh, customerId]);
 
   const addToCart = useCallback(
-    (product: Product) => {
+    (product: Product, qty = 1) => {
       const current = cartRef.current;
       const existing = current.find((i) => i.id === product.id);
       const currentQty = existing?.quantity ?? 0;
-      if (currentQty >= product.stock) {
-        showToast(`Stock insuficiente para ${product.name}`, 'error');
+      if (currentQty + qty > product.stock) {
+        showToast(`Stock máximo disponible para ${product.name}: ${product.stock} un.`, 'error');
         return;
       }
       setCart(
         existing
-          ? current.map((i) => (i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i))
-          : [...current, { ...product, quantity: 1 }],
+          ? current.map((i) => (i.id === product.id ? { ...i, quantity: i.quantity + qty } : i))
+          : [...current, { ...product, quantity: qty }],
       );
       showToast(`¡${product.name} añadido al carrito!`, 'success');
     },

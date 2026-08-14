@@ -54,7 +54,7 @@ export function Header() {
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <DollarSign className="w-4 h-4 text-amber-500" />
             <span>
-              Tasa: <strong>Bs. {rate.toFixed(2)}</strong>
+              Tasa de la tienda: <strong>Bs. {rate.toFixed(2)}</strong>
             </span>
           </div>
 

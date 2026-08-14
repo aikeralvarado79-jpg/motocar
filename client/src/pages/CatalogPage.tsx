@@ -143,8 +143,8 @@ export function CatalogPage() {
 
       {/* BUSCADOR Y FILTROS */}
       <div
-        className={`p-5 sm:p-6 rounded-3xl border mb-10 flex flex-col xl:flex-row gap-5 items-center justify-between shadow-xl backdrop-blur-xl w-full glass-panel ${
-          darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'
+        className={`sticky top-[calc(4rem+env(safe-area-inset-top))] sm:top-20 z-30 p-5 sm:p-6 rounded-3xl border mb-10 flex flex-col xl:flex-row gap-5 items-center justify-between shadow-xl backdrop-blur-xl w-full glass-panel ${
+          darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white/90 border-slate-200'
         }`}
       >
         <div className="relative w-full xl:w-96">
