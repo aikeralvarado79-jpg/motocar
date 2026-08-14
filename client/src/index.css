@@ -77,6 +77,16 @@ body {
   animation: fadeInUp 0.25s ease-out both;
 }
 
+/* Ocultar scrollbar de filas deslizables de chips */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Fondo vivo sutil: orbes que derivan lentamente */
 @keyframes orbDrift {
   0% {

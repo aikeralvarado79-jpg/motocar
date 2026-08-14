@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
 import type { Product, VehicleType } from '@shared/types';
-import { Bike, Car, Filter, Flame, Search } from 'lucide-react';
+import { Bike, Car, Flame, Search } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { ProductDetailsModal } from '../components/modals/ProductDetailsModal';
 import { SelectMenu } from '../components/ui/SelectMenu';
@@ -21,10 +21,15 @@ const categories = [
 
 const categoryOrder = ['motor', 'frenos', 'suspensión', 'transmisión', 'eléctrico'];
 
-const vehicleOptions = [
-  { value: 'all', label: 'Todos los Vehículos' },
-  { value: 'car', label: 'Carros' },
-  { value: 'moto', label: 'Motos' },
+const vehicleChips: Array<{ value: VehicleType | 'all'; label: string; Icon?: typeof Car }> = [
+  { value: 'all', label: 'Todos' },
+  { value: 'car', label: 'Carros', Icon: Car },
+  { value: 'moto', label: 'Motos', Icon: Bike },
+];
+
+const categoryChips: Array<{ value: string; label: string }> = [
+  { value: 'all', label: 'Todas' },
+  ...categories.slice(1),
 ];
 
 const sortOptions: Array<{ value: SortKey; label: string }> = [
@@ -138,11 +143,6 @@ export function CatalogPage() {
     });
   }, [filteredProducts]);
 
-  const inputBase = (dark: boolean) =>
-    `w-full pl-12 pr-4 py-3 rounded-2xl border text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
-      dark ? 'bg-slate-950/80 border-slate-800 text-slate-100 placeholder:text-slate-500' : 'bg-slate-50 border-slate-200 text-slate-800'
-    }`;
-
   return (
     <div className="relative isolate w-full space-y-8 animate-in fade-in duration-200">
       <CatalogBackground />
@@ -205,46 +205,92 @@ export function CatalogPage() {
         </div>
       </div>
 
-      {/* BUSCADOR Y FILTROS */}
-      <div
-        className={`sticky top-[calc(4rem+env(safe-area-inset-top))] sm:top-20 z-30 p-5 sm:p-6 rounded-3xl border mb-10 flex flex-col xl:flex-row gap-5 items-center justify-between shadow-xl backdrop-blur-xl w-full glass-panel ${
-          darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white/90 border-slate-200'
-        }`}
-      >
-        <div className="relative w-full xl:w-96">
-          <Search className="absolute left-4 top-3.5 w-5 h-5 text-amber-500" />
-          <input
-            type="text"
-            placeholder="Buscar por nombre, pieza o SKU..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className={inputBase(darkMode)}
-          />
-        </div>
+      {/* BUSCADOR, VEHÍCULOS Y CATEGORÍAS (fijos con scroll horizontal deslizable) */}
+      <div className="sticky top-[calc(4rem+env(safe-area-inset-top))] sm:top-20 z-30 w-full">
+        <div
+          className={`rounded-3xl border p-3 sm:p-4 shadow-xl backdrop-blur-xl w-full glass-panel ${
+            darkMode ? 'bg-slate-900/85 border-slate-800' : 'bg-white/90 border-slate-200'
+          }`}
+        >
+          {/* Búsqueda + orden */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 min-w-0">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-500" />
+              <input
+                type="text"
+                placeholder="Buscar por nombre, pieza o SKU..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`w-full pl-10 pr-3.5 py-2.5 rounded-xl border text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
+                  darkMode
+                    ? 'bg-slate-950/80 border-slate-800 text-slate-100 placeholder:text-slate-500'
+                    : 'bg-slate-50 border-slate-200 text-slate-800'
+                }`}
+              />
+            </div>
+            <SelectMenu
+              value={sortBy}
+              onChange={(v) => setSortBy(v as SortKey)}
+              options={sortOptions}
+              ariaLabel="Ordenar productos"
+              className="w-36 sm:w-44 shrink-0"
+            />
+          </div>
 
-        <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
-          <Filter className="hidden md:block w-4 h-4 text-amber-500" />
-          <SelectMenu
-            value={vehicleFilter}
-            onChange={(v) => setVehicleFilter(v as VehicleType | 'all')}
-            options={vehicleOptions}
-            ariaLabel="Filtrar por tipo de vehículo"
-            className="flex-1 sm:flex-none sm:w-44"
-          />
-          <SelectMenu
-            value={categoryFilter}
-            onChange={setCategoryFilter}
-            options={categories}
-            ariaLabel="Filtrar por categoría"
-            className="flex-1 sm:flex-none sm:w-48"
-          />
-          <SelectMenu
-            value={sortBy}
-            onChange={(v) => setSortBy(v as SortKey)}
-            options={sortOptions}
-            ariaLabel="Ordenar productos"
-            className="flex-1 sm:flex-none sm:w-52"
-          />
+          {/* Vehículos: chips deslizables */}
+          <div className="mt-3 flex items-center gap-2 overflow-x-auto no-scrollbar -mx-3 px-3 snap-x [mask-image:linear-gradient(to_right,black_calc(100%-24px),transparent)]">
+            <span
+              className={`shrink-0 text-[9px] font-black uppercase tracking-widest ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}
+            >
+              Vehículo
+            </span>
+            {vehicleChips.map(({ value, label, Icon }) => {
+              const active = vehicleFilter === value;
+              return (
+                <button
+                  key={value}
+                  onClick={() => setVehicleFilter(value)}
+                  className={`snap-start shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider border transition-all duration-150 active:scale-95 ${
+                    active
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 border-transparent shadow-lg shadow-amber-500/30'
+                      : darkMode
+                        ? 'bg-slate-950/60 border-slate-800 text-slate-300 hover:bg-slate-800'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  {Icon && <Icon className="w-3.5 h-3.5" />}
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Categorías: chips deslizables */}
+          <div className="mt-2 flex items-center gap-2 overflow-x-auto no-scrollbar -mx-3 px-3 snap-x [mask-image:linear-gradient(to_right,black_calc(100%-24px),transparent)]">
+            <span
+              className={`shrink-0 text-[9px] font-black uppercase tracking-widest ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}
+            >
+              Categoría
+            </span>
+            {categoryChips.map(({ value, label }) => {
+              const active = categoryFilter === value;
+              return (
+                <button
+                  key={value}
+                  onClick={() => setCategoryFilter(value)}
+                  className={`snap-start shrink-0 flex items-center px-3.5 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider border transition-all duration-150 active:scale-95 ${
+                    active
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 border-transparent shadow-lg shadow-amber-500/30'
+                      : darkMode
+                        ? 'bg-slate-950/60 border-slate-800 text-slate-300 hover:bg-slate-800'
+                        : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
