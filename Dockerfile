@@ -27,10 +27,9 @@ RUN npm run build -w client
 FROM node:22-alpine
 
 # Usuario standard de Hugging Face Spaces (UID 1000)
-RUN addgroup -S app && adduser -S -G app -u 1000 app
-
+# node:22-alpine ya incluye el usuario "node" con UID 1000
 ENV NODE_ENV=production
-ENV HOME=/home/app
+ENV HOME=/home/node
 WORKDIR /app
 
 COPY --from=build /app/package.json ./
@@ -52,6 +51,6 @@ EXPOSE 4000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s \
   CMD wget -qO- http://127.0.0.1:4000/api/health || exit 1
 
-USER app
+USER node
 
 CMD ["npm", "run", "start", "-w", "server"]
