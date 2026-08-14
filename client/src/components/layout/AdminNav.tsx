@@ -7,7 +7,7 @@ const tabs = [
   { to: '/admin/products', label: 'Catálogo & Inventario', icon: Package },
   { to: '/admin/orders', label: 'Gestión de Pedidos & GPS', icon: Truck },
   { to: '/admin/finance', label: 'Módulo Financiero Pro', icon: DollarSign },
-  { to: '/admin/rates', label: 'Tasas BCV & Historial', icon: RefreshCw },
+  { to: '/admin/rates', label: 'Tasa & Historial', icon: RefreshCw },
 ];
 
 export function AdminNav() {

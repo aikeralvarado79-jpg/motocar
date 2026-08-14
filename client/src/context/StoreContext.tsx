@@ -170,7 +170,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ? current.map((i) => (i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i))
           : [...current, { ...product, quantity: 1 }],
       );
-      showToast(`¡${product.name} añadido al garaje!`, 'success');
+      showToast(`¡${product.name} añadido al carrito!`, 'success');
     },
     [showToast],
   );

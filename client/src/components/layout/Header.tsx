@@ -1,5 +1,5 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { DollarSign, Gauge, LogOut, Moon, Package, ShieldCheck, ShoppingBag, Sun } from 'lucide-react';
+import { DollarSign, Gauge, LogOut, Moon, Package, ShieldCheck, ShoppingCart, Sun } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useStore } from '../../context/StoreContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -54,7 +54,7 @@ export function Header() {
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             <DollarSign className="w-4 h-4 text-amber-500" />
             <span>
-              Tasa BCV: <strong>Bs. {rate.toFixed(2)}</strong>
+              Tasa: <strong>Bs. {rate.toFixed(2)}</strong>
             </span>
           </div>
 
@@ -64,7 +64,7 @@ export function Header() {
             </NavLink>
             <NavLink to="/cart" className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkIdle(darkMode)}`}>
               <span className="flex items-center gap-1.5">
-                <ShoppingBag className="w-4 h-4" /> Garaje{cartCount > 0 && ` (${cartCount})`}
+                <ShoppingCart className="w-4 h-4" /> Carrito{cartCount > 0 && ` (${cartCount})`}
               </span>
             </NavLink>
             <NavLink to="/orders" className={({ isActive }) => `${linkBase} ${isActive ? linkActive : linkIdle(darkMode)}`}>

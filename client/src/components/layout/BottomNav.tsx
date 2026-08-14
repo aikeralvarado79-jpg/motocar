@@ -1,11 +1,11 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Package, ShieldCheck, ShoppingBag } from 'lucide-react';
+import { Home, Package, ShieldCheck, ShoppingCart } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { useTheme } from '../../context/ThemeContext';
 
 const items = [
   { to: '/', label: 'Inicio', icon: Home, end: true },
-  { to: '/cart', label: 'Garaje', icon: ShoppingBag },
+  { to: '/cart', label: 'Carrito', icon: ShoppingCart },
   { to: '/orders', label: 'Pedidos', icon: Package },
   { to: '/admin', label: 'Admin', icon: ShieldCheck },
 ];

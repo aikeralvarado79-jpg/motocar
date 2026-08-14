@@ -3,6 +3,7 @@ import type { Product, VehicleType } from '@shared/types';
 import { Bike, Car, Filter, Flame, Search } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
 import { ProductDetailsModal } from '../components/modals/ProductDetailsModal';
+import { SelectMenu } from '../components/ui/SelectMenu';
 import { useStore } from '../context/StoreContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -15,6 +16,21 @@ const categories = [
   { value: 'suspensión', label: 'Suspensión' },
   { value: 'transmisión', label: 'Transmisión' },
   { value: 'eléctrico', label: 'Eléctrico' },
+];
+
+const categoryOrder = ['motor', 'frenos', 'suspensión', 'transmisión', 'eléctrico'];
+
+const vehicleOptions = [
+  { value: 'all', label: 'Todos los Vehículos' },
+  { value: 'car', label: 'Carros' },
+  { value: 'moto', label: 'Motos' },
+];
+
+const sortOptions: Array<{ value: SortKey; label: string }> = [
+  { value: 'featured', label: 'Más Destacados' },
+  { value: 'price_asc', label: 'Precio: Menor a Mayor' },
+  { value: 'price_desc', label: 'Precio: Mayor a Menor' },
+  { value: 'name', label: 'Nombre A-Z' },
 ];
 
 export function CatalogPage() {
@@ -45,9 +61,24 @@ export function CatalogPage() {
       });
   }, [products, searchQuery, vehicleFilter, categoryFilter, sortBy]);
 
-  const selectClass = (dark: boolean) =>
-    `px-4 py-3 rounded-2xl border text-xs font-black uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-amber-500 ${
-      dark ? 'bg-slate-950/80 border-slate-800 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-700'
+  // Agrupa por categoría en el orden del estante (vista tipo tienda)
+  const shelves = useMemo(() => {
+    const map = new Map<string, Product[]>();
+    filteredProducts.forEach((p) => {
+      const arr = map.get(p.category) ?? [];
+      arr.push(p);
+      map.set(p.category, arr);
+    });
+    return [...map.entries()].sort((a, b) => {
+      const ia = categoryOrder.indexOf(a[0]);
+      const ib = categoryOrder.indexOf(b[0]);
+      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    });
+  }, [filteredProducts]);
+
+  const inputBase = (dark: boolean) =>
+    `w-full pl-12 pr-4 py-3 rounded-2xl border text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
+      dark ? 'bg-slate-950/80 border-slate-800 text-slate-100 placeholder:text-slate-500' : 'bg-slate-50 border-slate-200 text-slate-800'
     }`;
 
   return (
@@ -64,7 +95,7 @@ export function CatalogPage() {
           <h2 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
             Componentes de Competición con{' '}
             <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-              Tasa BCV en Tiempo Real
+              Tasa en Tiempo Real
             </span>
           </h2>
           <p className="text-sm sm:text-base leading-relaxed text-slate-300">
@@ -98,14 +129,14 @@ export function CatalogPage() {
         <div className="relative z-10 hidden lg:block w-80 h-56 rounded-2xl overflow-hidden shadow-2xl border border-slate-700 group">
           <img
             src="https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&q=80&w=800"
-            alt="Garaje de competición"
+            alt="Taller de competición"
             loading="lazy"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80" />
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs font-black">
             <span className="text-amber-400">⚡ Biometría VIP</span>
-            <span className="text-white bg-red-600/80 px-2.5 py-1 rounded-lg">BCV Verificado</span>
+            <span className="text-white bg-red-600/80 px-2.5 py-1 rounded-lg">Tasa de la Tienda</span>
           </div>
         </div>
       </div>
@@ -123,51 +154,64 @@ export function CatalogPage() {
             placeholder="Buscar por nombre, pieza o SKU..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className={`w-full pl-12 pr-4 py-3 rounded-2xl border text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${
-              darkMode
-                ? 'bg-slate-950/80 border-slate-800 text-slate-100 placeholder:text-slate-500'
-                : 'bg-slate-50 border-slate-200 text-slate-800'
-            }`}
+            className={inputBase(darkMode)}
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
           <Filter className="hidden md:block w-4 h-4 text-amber-500" />
-          <select value={vehicleFilter} onChange={(e) => setVehicleFilter(e.target.value as VehicleType | 'all')} className={selectClass(darkMode)}>
-            <option value="all">Todos los Vehículos</option>
-            <option value="car">Carros</option>
-            <option value="moto">Motos</option>
-          </select>
-
-          <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className={selectClass(darkMode)}>
-            {categories.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-
-          <select value={sortBy} onChange={(e) => setSortBy(e.target.value as SortKey)} className={selectClass(darkMode)}>
-            <option value="featured">Más Destacados</option>
-            <option value="price_asc">Precio: Menor a Mayor</option>
-            <option value="price_desc">Precio: Mayor a Menor</option>
-            <option value="name">Nombre A-Z</option>
-          </select>
+          <SelectMenu
+            value={vehicleFilter}
+            onChange={(v) => setVehicleFilter(v as VehicleType | 'all')}
+            options={vehicleOptions}
+            ariaLabel="Filtrar por tipo de vehículo"
+            className="flex-1 sm:flex-none sm:w-44"
+          />
+          <SelectMenu
+            value={categoryFilter}
+            onChange={setCategoryFilter}
+            options={categories}
+            ariaLabel="Filtrar por categoría"
+            className="flex-1 sm:flex-none sm:w-48"
+          />
+          <SelectMenu
+            value={sortBy}
+            onChange={(v) => setSortBy(v as SortKey)}
+            options={sortOptions}
+            ariaLabel="Ordenar productos"
+            className="flex-1 sm:flex-none sm:w-52"
+          />
         </div>
       </div>
 
-      {/* GRID DE PRODUCTOS */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6 w-full">
-        {filteredProducts.map((product) => (
-          <ProductCard key={product.id} product={product} onInspect={setSelectedProduct} />
+      {/* ESTANTES POR CATEGORÍA */}
+      <div className="space-y-10 w-full">
+        {shelves.map(([category, items]) => (
+          <section key={category} className="space-y-4">
+            <div className="flex items-center gap-3">
+              <h2 className="font-black text-lg sm:text-xl uppercase tracking-widest flex items-center gap-2">
+                <span className="w-1.5 h-6 rounded-full bg-gradient-to-b from-amber-500 to-orange-600" />
+                {category}
+              </h2>
+              <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-[10px] font-black text-amber-500">
+                {items.length}
+              </span>
+            </div>
+
+            <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x">
+              {items.map((product) => (
+                <ProductCard key={product.id} product={product} onInspect={setSelectedProduct} />
+              ))}
+            </div>
+          </section>
         ))}
-      </div>
 
-      {filteredProducts.length === 0 && (
-        <div className="p-12 rounded-3xl border text-center text-sm font-bold text-slate-400 glass-panel">
-          No se encontraron repuestos con esos filtros.
-        </div>
-      )}
+        {shelves.length === 0 && (
+          <div className="p-12 rounded-3xl border text-center text-sm font-bold text-slate-400 glass-panel">
+            No se encontraron repuestos con esos filtros.
+          </div>
+        )}
+      </div>
 
       <ProductDetailsModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />
     </div>

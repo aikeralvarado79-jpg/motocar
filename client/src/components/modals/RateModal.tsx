@@ -28,7 +28,7 @@ export function RateModal({ open, onClose }: RateModalProps) {
     try {
       await api.updateRate(val, token);
       setInput('');
-      showToast('¡Tasa BCV actualizada con éxito en la red!', 'success');
+      showToast('¡Tasa actualizada con éxito en la red!', 'success');
       void refresh();
       onClose();
     } catch (err) {
@@ -37,10 +37,10 @@ export function RateModal({ open, onClose }: RateModalProps) {
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Actualizar Tasa BCV Oficial">
+    <Modal open={open} onClose={onClose} title="Actualizar Tasa de la Tienda">
       <p className="text-xs text-slate-400 font-semibold leading-relaxed mb-5">
-        Ingresa la nueva tasa cambiaria oficial. Se actualizará automáticamente el doble etiquetado en toda la
-        plataforma y en todos los dispositivos conectados, y quedará registrada en la auditoría.
+        Ingresa la nueva tasa personalizada de la tienda. Se actualizará automáticamente el doble etiquetado en toda
+        la plataforma y en todos los dispositivos conectados, y quedará registrada en la auditoría.
       </p>
 
       <input

@@ -17,7 +17,7 @@ export function DashboardPage() {
     { title: 'Ventas Totales (Mes)', value: `$${stats.monthIncome.toFixed(2)}`, change: formatBs(stats.monthIncome, rate), icon: TrendingUp, color: 'text-emerald-400' },
     { title: 'Pedidos en Tránsito', value: String(stats.pendingOrders), change: 'GPS Activo', icon: Clock, color: 'text-amber-400' },
     { title: 'Stock Global Piezas', value: String(stats.totalStock), change: `${stats.totalProducts} SKUs protegidos`, icon: Package, color: 'text-blue-400' },
-    { title: 'Tasa BCV Vigente', value: `Bs. ${rate.toFixed(2)}`, change: 'Actualizado Hoy', icon: DollarSign, color: 'text-purple-400' },
+    { title: 'Tasa Vigente', value: `Bs. ${rate.toFixed(2)}`, change: 'Actualizado Hoy', icon: DollarSign, color: 'text-purple-400' },
   ];
 
   return (
@@ -25,13 +25,13 @@ export function DashboardPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl sm:text-3xl font-black tracking-tight">Dashboard General Pro</h2>
-          <p className="text-xs font-bold text-slate-400">Control operativo, métricas en tiempo real y tasa BCV activa.</p>
+          <p className="text-xs font-bold text-slate-400">Control operativo, métricas en tiempo real y tasa activa.</p>
         </div>
         <button
           onClick={() => navigate('/admin/rates')}
           className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 text-slate-950 font-black text-xs uppercase tracking-wider shadow-lg shadow-amber-500/30 flex items-center gap-2 glass-panel"
         >
-          <RefreshCw className="w-4 h-4" /> Actualizar Tasa BCV
+          <RefreshCw className="w-4 h-4" /> Actualizar Tasa
         </button>
       </div>
 

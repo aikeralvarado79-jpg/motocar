@@ -11,7 +11,7 @@ export function RatesPage() {
 
   return (
     <div className="w-full max-w-3xl mx-auto space-y-6">
-      <h2 className="text-2xl sm:text-3xl font-black tracking-tight">Tasas BCV & Historial de Auditoría</h2>
+      <h2 className="text-2xl sm:text-3xl font-black tracking-tight">Tasa de la Tienda & Historial de Auditoría</h2>
 
       <div
         className={`p-8 rounded-3xl border backdrop-blur-xl space-y-4 w-full glass-panel ${
@@ -20,7 +20,7 @@ export function RatesPage() {
       >
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <div className="text-xs font-black uppercase tracking-wider text-slate-400">Tasa Oficial BCV Vigente</div>
+            <div className="text-xs font-black uppercase tracking-wider text-slate-400">Tasa Vigente de la Tienda</div>
             <div className="text-4xl font-black text-amber-400 mt-1">
               Bs. {rate.toFixed(2)} <span className="text-sm font-bold text-slate-400">/ USD</span>
             </div>
@@ -39,9 +39,7 @@ export function RatesPage() {
           darkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200 shadow-xl'
         }`}
       >
-        <h3 className="font-black text-base uppercase tracking-wider">
-          Histórico de Modificaciones & Trazabilidad Contable
-        </h3>
+        <h3 className="font-black text-base uppercase tracking-wider">Histórico de Modificaciones & Trazabilidad Contable</h3>
         <div className="divide-y divide-slate-800/40">
           {rateHistory.length === 0 && (
             <div className="py-6 text-center text-xs font-bold text-slate-400">Sin registros de auditoría.</div>

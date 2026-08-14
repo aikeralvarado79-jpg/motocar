@@ -1,5 +1,5 @@
 import type { Product } from '@shared/types';
-import { Eye, ShoppingBag, Star } from 'lucide-react';
+import { ShoppingBag, ShoppingCart, Star } from 'lucide-react';
 import { useStore } from '../context/StoreContext';
 import { useTheme } from '../context/ThemeContext';
 import { formatBs } from '../lib/format';
@@ -15,12 +15,21 @@ export function ProductCard({ product, onInspect }: ProductCardProps) {
 
   return (
     <div
-      className={`rounded-2xl sm:rounded-3xl border overflow-hidden flex flex-col justify-between glass-panel group ${
+      onClick={() => onInspect(product)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onInspect(product);
+        }
+      }}
+      className={`w-52 sm:w-56 lg:w-64 shrink-0 rounded-2xl sm:rounded-3xl border overflow-hidden flex flex-col justify-between glass-panel group cursor-pointer transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl ${
         darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white border-slate-200 shadow-lg shadow-slate-200/50'
       }`}
     >
       <div>
-        <div className="relative h-24 sm:h-44 lg:h-56 overflow-hidden bg-slate-950">
+        <div className="relative h-32 sm:h-40 lg:h-48 overflow-hidden bg-slate-950">
           <img
             src={product.image}
             alt={product.name}
@@ -64,7 +73,7 @@ export function ProductCard({ product, onInspect }: ProductCardProps) {
           <div className="text-[10px] sm:text-[11px] font-black text-amber-500 tracking-wider">
             SKU: {product.sku}
           </div>
-          <h3 className="font-black text-xs sm:text-base line-clamp-1 group-hover:text-amber-400 transition-colors duration-200">
+          <h3 className="font-black text-sm sm:text-base line-clamp-1 group-hover:text-amber-400 transition-colors duration-200">
             {product.name}
           </h3>
           <p className={`hidden sm:block text-xs line-clamp-2 leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
@@ -86,24 +95,24 @@ export function ProductCard({ product, onInspect }: ProductCardProps) {
         </div>
       </div>
 
-      <div className="p-3 sm:p-5 pt-0 flex flex-col sm:flex-row items-stretch gap-1.5 sm:gap-2">
+      <div className="p-3 sm:p-5 pt-0">
         <button
-          onClick={() => onInspect(product)}
-          className={`flex-1 flex items-center justify-center gap-1.5 px-2 sm:px-3 py-2 sm:py-3 rounded-xl sm:rounded-2xl border text-[10px] sm:text-xs font-black uppercase tracking-wider transition-all duration-200 ${
-            darkMode
-              ? 'border-slate-800 hover:bg-slate-800 text-slate-300'
-              : 'border-slate-200 hover:bg-slate-100 text-slate-700'
-          }`}
-        >
-          <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          <span className="hidden sm:inline">Inspeccionar</span>
-        </button>
-        <button
-          onClick={() => addToCart(product)}
+          onClick={(e) => {
+            e.stopPropagation();
+            addToCart(product);
+          }}
           disabled={product.stock === 0}
-          className="flex-1 py-2 sm:py-3 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-slate-950 font-black text-[11px] sm:text-xs uppercase tracking-wider shadow-xl shadow-amber-500/20 transition-all duration-200 flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-full py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-slate-950 font-black text-[11px] sm:text-xs uppercase tracking-wider shadow-xl shadow-amber-500/20 transition-all duration-200 flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> {product.stock === 0 ? 'Agotado' : 'Comprar'}
+          {product.stock === 0 ? (
+            <>
+              <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Agotado
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> Comprar
+            </>
+          )}
         </button>
       </div>
     </div>
