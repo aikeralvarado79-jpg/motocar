@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { X } from 'lucide-react';
@@ -25,7 +26,7 @@ export function Modal({ open, onClose, children, maxWidth = 'max-w-md', title }:
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex overflow-y-auto p-4 animate-in fade-in duration-200"
       onClick={onClose}
@@ -50,6 +51,7 @@ export function Modal({ open, onClose, children, maxWidth = 'max-w-md', title }:
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

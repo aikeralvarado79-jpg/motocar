@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { useEffect, useRef, useState } from 'react';
 import { Fingerprint } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
@@ -48,7 +49,7 @@ export function BiometricModal({ open, onClose, onVerified }: BiometricModalProp
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex overflow-y-auto p-4 animate-in fade-in duration-200"
       role="dialog"
@@ -104,6 +105,7 @@ export function BiometricModal({ open, onClose, onVerified }: BiometricModalProp
           </button>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
