@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { X } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
@@ -12,17 +13,27 @@ interface ModalProps {
 
 export function Modal({ open, onClose, children, maxWidth = 'max-w-md', title }: ModalProps) {
   const { darkMode } = useTheme();
+
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 animate-in overflow-y-auto"
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex overflow-y-auto p-4 animate-in fade-in duration-200"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
     >
       <div
-        className={`${maxWidth} w-full rounded-3xl border p-6 sm:p-8 shadow-2xl glass-panel relative ${
+        className={`${maxWidth} w-full rounded-3xl border p-6 sm:p-8 shadow-2xl glass-panel relative m-auto max-h-[calc(100dvh-2rem)] overflow-y-auto ${
           darkMode ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
         }`}
         onClick={(e) => e.stopPropagation()}

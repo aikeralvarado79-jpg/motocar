@@ -20,6 +20,15 @@ export function BiometricModal({ open, onClose, onVerified }: BiometricModalProp
   const timers = useRef<Array<ReturnType<typeof setTimeout>>>([]);
 
   useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
+  useEffect(() => {
     const pending = timers.current;
     return () => {
       pending.forEach(clearTimeout);
@@ -41,12 +50,12 @@ export function BiometricModal({ open, onClose, onVerified }: BiometricModalProp
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex overflow-y-auto p-4 animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
     >
       <div
-        className={`max-w-md w-full rounded-3xl border p-8 space-y-6 text-center shadow-2xl glass-panel ${
+        className={`max-w-md w-full rounded-3xl border p-8 space-y-6 text-center shadow-2xl glass-panel m-auto max-h-[calc(100dvh-2rem)] overflow-y-auto ${
           darkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900'
         }`}
       >
