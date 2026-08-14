@@ -19,7 +19,7 @@ export function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-40 w-full backdrop-blur-xl border-b transition-all duration-300 ${
+      className={`safe-top sticky top-0 z-40 w-full backdrop-blur-xl border-b transition-all duration-300 ${
         darkMode
           ? 'bg-[#0b0e14]/85 border-slate-800/80 shadow-xl shadow-black/40'
           : 'bg-white/85 border-slate-200/85 shadow-md shadow-slate-200/50'

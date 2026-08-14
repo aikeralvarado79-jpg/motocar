@@ -15,6 +15,11 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Evita que la barra de estado iOS (notch) superponga el header */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
 /* Panel con efecto vidrio */
 .glass-panel {
   will-change: transform, box-shadow, background-color;
