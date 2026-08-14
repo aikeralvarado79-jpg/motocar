@@ -20,19 +20,6 @@ body {
   padding-top: env(safe-area-inset-top);
 }
 
-/* Banner de actualización: queda pegado justo bajo el header sticky */
-.update-banner {
-  position: sticky;
-  top: calc(4rem + env(safe-area-inset-top));
-  z-index: 39;
-}
-
-@media (min-width: 640px) {
-  .update-banner {
-    top: 5rem;
-  }
-}
-
 /* Panel con efecto vidrio */
 .glass-panel {
   will-change: transform, box-shadow, background-color;
