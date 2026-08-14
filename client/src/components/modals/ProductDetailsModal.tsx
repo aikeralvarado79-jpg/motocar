@@ -18,6 +18,7 @@ export function ProductDetailsModal({ product, onClose }: ProductDetailsModalPro
 
   if (!product) return null;
   const out = product.stock === 0;
+  const subtotal = product.price * qty;
 
   return (
     <Modal open={!!product} onClose={onClose} maxWidth="max-w-xl">
@@ -74,6 +75,14 @@ export function ProductDetailsModal({ product, onClose }: ProductDetailsModalPro
               </div>
               <div className="text-[9px] font-bold text-slate-400 mt-1 tracking-wider">
                 Doble etiquetado dinámico USD / VES
+              </div>
+              <div className="flex items-center justify-between gap-2 mt-2 pt-2 border-t border-amber-500/25">
+                <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                  Subtotal · {qty} un.
+                </span>
+                <span className="text-xs font-black text-amber-300">
+                  ${subtotal.toFixed(2)} <span className="text-slate-500">·</span> {formatBs(subtotal, rate)}
+                </span>
               </div>
             </div>
           </div>

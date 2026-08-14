@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type { CSSProperties } from 'react';
 import type { Product, VehicleType } from '@shared/types';
 import { Bike, Car, Filter, Flame, Search } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
@@ -32,6 +33,67 @@ const sortOptions: Array<{ value: SortKey; label: string }> = [
   { value: 'price_desc', label: 'Precio: Mayor a Menor' },
   { value: 'name', label: 'Nombre A-Z' },
 ];
+
+/* Fondo dinámico y vivo que reacciona suavemente al scroll */
+function CatalogBackground() {
+  const { darkMode } = useTheme();
+  const [offset, setOffset] = useState(0);
+
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => setOffset(window.scrollY));
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  const layer = (speed: number): CSSProperties => ({
+    transform: `translate3d(0, ${offset * speed}px, 0)`,
+  });
+
+  const orbs = [
+    {
+      cls: 'absolute -top-32 -left-24 w-[440px] h-[440px]',
+      speed: 0.03,
+      orb: (dark: boolean) => (dark ? 'bg-amber-600/10' : 'bg-amber-400/25'),
+      slow: false,
+    },
+    {
+      cls: 'absolute top-[28%] -right-28 w-[520px] h-[520px]',
+      speed: 0.06,
+      orb: (dark: boolean) => (dark ? 'bg-orange-700/10' : 'bg-orange-500/20'),
+      slow: true,
+    },
+    {
+      cls: 'absolute top-[52%] -left-32 w-[420px] h-[420px]',
+      speed: 0.09,
+      orb: (dark: boolean) => (dark ? 'bg-red-700/10' : 'bg-rose-400/15'),
+      slow: false,
+    },
+    {
+      cls: 'absolute bottom-[-8%] right-[-10%] w-[480px] h-[480px]',
+      speed: 0.05,
+      orb: (dark: boolean) => (dark ? 'bg-amber-500/10' : 'bg-amber-300/20'),
+      slow: true,
+    },
+  ];
+
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+      {orbs.map((o, i) => (
+        <div key={i} className={o.cls} style={layer(o.speed)}>
+          <div className={`w-full h-full rounded-full blur-3xl animate-orb ${o.slow ? 'animate-orb-slow' : ''} ${o.orb(darkMode)}`} />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function CatalogPage() {
   const { darkMode } = useTheme();
@@ -82,7 +144,9 @@ export function CatalogPage() {
     }`;
 
   return (
-    <div className="w-full space-y-8 animate-in fade-in duration-200">
+    <div className="relative isolate w-full space-y-8 animate-in fade-in duration-200">
+      <CatalogBackground />
+
       {/* HERO */}
       <div className="relative rounded-3xl overflow-hidden mb-12 bg-gradient-to-br from-slate-950 via-[#121620] to-amber-950 p-6 sm:p-12 lg:p-16 text-white shadow-2xl border border-slate-800/80 flex flex-col lg:flex-row items-center justify-between gap-10 w-full glass-panel">
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:20px_20px]" />

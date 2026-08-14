@@ -1,12 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowDownUp, Calculator, Maximize2, X } from 'lucide-react';
+import { ArrowDownUp, Calculator, GripVertical, Maximize2, X } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
 import { useTheme } from '../../context/ThemeContext';
 import { formatAmountValue, maskAmount, parseAmount } from '../../lib/calc';
-import { Modal } from '../ui/Modal';
 
-type View = 'closed' | 'mini' | 'full';
 type Currency = 'usd' | 'bs';
 type Operator = '+' | '-' | '*' | '/';
 
@@ -37,9 +35,9 @@ interface FieldProps {
 function AmountField({ label, prefix, prefixClass, value, onChange, darkMode }: FieldProps) {
   return (
     <label className="block">
-      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</span>
+      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{label}</span>
       <div
-        className={`mt-1.5 flex items-center gap-2 rounded-2xl border px-3.5 py-3 focus-within:ring-2 focus-within:ring-amber-500 transition-all ${
+        className={`mt-1 flex items-center gap-2 rounded-xl border px-3 py-2.5 focus-within:ring-2 focus-within:ring-amber-500 transition-all ${
           darkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-50 border-slate-200'
         }`}
       >
@@ -49,15 +47,29 @@ function AmountField({ label, prefix, prefixClass, value, onChange, darkMode }: 
           value={value}
           onChange={(e) => onChange(maskAmount(e.target.value))}
           placeholder="0,00"
-          className="w-full bg-transparent text-right text-2xl font-black tracking-tight outline-none placeholder:text-slate-500"
+          className="w-full bg-transparent text-right text-xl font-black tracking-tight outline-none placeholder:text-slate-500"
         />
       </div>
     </label>
   );
 }
 
-/* ------------------------------- MINI MODAL ------------------------------- */
-function MiniModal({ rate, darkMode, onClose, onFull }: { rate: number; darkMode: boolean; onClose: () => void; onFull: () => void }) {
+/* --------------------- MINI PANEL FLOTANTE (usable al navegar) --------------------- */
+function MiniPanel({
+  rate,
+  darkMode,
+  onClose,
+  onFull,
+}: {
+  rate: number;
+  darkMode: boolean;
+  onClose: () => void;
+  onFull: () => void;
+}) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
+  const dragRef = useRef<{ px: number; py: number; x: number; y: number } | null>(null);
+
   const [usdStr, setUsdStr] = useState('');
   const [bsStr, setBsStr] = useState('');
 
@@ -72,42 +84,88 @@ function MiniModal({ rate, darkMode, onClose, onFull }: { rate: number; darkMode
     setUsdStr(bs > 0 ? formatAmountValue(bs / rate) : v === '' ? '' : '0');
   };
 
+  const handleDown = (e: React.PointerEvent) => {
+    const rect = panelRef.current?.getBoundingClientRect();
+    const w = rect?.width ?? 300;
+    const h = rect?.height ?? 300;
+    const base =
+      pos ?? { x: Math.max(8, window.innerWidth - w - 16), y: Math.max(8, window.innerHeight - (80 + 56 + 12 + h)) };
+    dragRef.current = { px: e.clientX, py: e.clientY, x: base.x, y: base.y };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const handleMove = (e: React.PointerEvent) => {
+    const s = dragRef.current;
+    if (!s) return;
+    const rect = panelRef.current?.getBoundingClientRect();
+    const w = rect?.width ?? 300;
+    const h = rect?.height ?? 300;
+    setPos({
+      x: Math.min(Math.max(8, s.x + e.clientX - s.px), window.innerWidth - w - 8),
+      y: Math.min(Math.max(8, s.y + e.clientY - s.py), window.innerHeight - h - 8),
+    });
+  };
+  const handleUp = () => {
+    dragRef.current = null;
+  };
+
   return (
-    <Modal open onClose={onClose} maxWidth="max-w-sm" title="Calculadora de Tasa">
-      <div className="space-y-3">
-        <div className="flex items-center justify-between px-3.5 py-2.5 rounded-2xl border border-amber-500/30 bg-amber-500/10">
-          <span className="text-[10px] font-black uppercase tracking-widest text-amber-500">Tasa de la tienda</span>
-          <span className="text-sm font-black text-amber-400">Bs. {rate.toFixed(2)}</span>
-        </div>
-
-        <AmountField label="Monto en Dólares (USD)" prefix="$" prefixClass="text-emerald-400" value={usdStr} onChange={syncFromUsd} darkMode={darkMode} />
-
-        <div className="flex items-center justify-center -my-1">
-          <span className="p-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-500">
-            <ArrowDownUp className="w-3.5 h-3.5" />
+    <div
+      ref={panelRef}
+      className={`fixed ${pos ? '' : 'right-4 bottom-[calc(5rem+env(safe-area-inset-bottom)+4.25rem)]'} w-[300px] z-40 rounded-2xl border shadow-2xl glass-panel overflow-hidden animate-in ${darkMode ? 'bg-[#0b0e14]/95 border-slate-800' : 'bg-white/95 border-slate-200'}`}
+      style={pos ? { left: pos.x, top: pos.y } : undefined}
+      role="dialog"
+      aria-label="Calculadora de tasa"
+    >
+      {/* Cabecera arrastrable */}
+      <div
+        className={`flex items-center gap-1.5 px-2.5 py-2 cursor-grab active:cursor-grabbing touch-none select-none ${darkMode ? 'bg-slate-950/60' : 'bg-slate-100/90'}`}
+        onPointerDown={handleDown}
+        onPointerMove={handleMove}
+        onPointerUp={handleUp}
+        onPointerCancel={handleUp}
+      >
+        <GripVertical className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+        <span className="flex-1 min-w-0">
+          <span className={`block text-[8px] font-black uppercase tracking-widest ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+            Tasa de la tienda
           </span>
-        </div>
-
-        <AmountField label="Monto en Bolívares (Bs)" prefix="Bs" prefixClass="text-amber-400" value={bsStr} onChange={syncFromBs} darkMode={darkMode} />
-
-        <p className={`text-[10px] leading-relaxed ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
-          Los miles se formatean automáticamente (1.000). Usa la coma (,) para escribir los decimales.
-        </p>
-
+          <span className="block text-[11px] font-black text-amber-400">Bs. {rate.toFixed(2)}</span>
+        </span>
         <button
+          onPointerDown={(e) => e.stopPropagation()}
           onClick={onFull}
-          className={`w-full py-3 rounded-2xl border text-[11px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-all duration-200 ${
-            darkMode ? 'border-slate-700 text-slate-200 hover:bg-slate-800' : 'border-slate-200 text-slate-700 hover:bg-slate-100'
-          }`}
+          title="Calculadora completa"
+          aria-label="Calculadora completa (pantalla completa)"
+          className={`p-2 rounded-xl transition-all ${darkMode ? 'text-amber-400 hover:bg-slate-800' : 'text-amber-600 hover:bg-slate-200/70'}`}
         >
-          <Maximize2 className="w-4 h-4 text-amber-500" /> Calculadora Completa
+          <Maximize2 className="w-4 h-4" />
+        </button>
+        <button
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={onClose}
+          title="Cerrar"
+          aria-label="Cerrar calculadora"
+          className={`p-2 rounded-xl transition-all ${darkMode ? 'text-slate-500 hover:bg-slate-800 hover:text-slate-200' : 'text-slate-400 hover:bg-slate-200/70 hover:text-slate-700'}`}
+        >
+          <X className="w-4 h-4" />
         </button>
       </div>
-    </Modal>
+
+      {/* Cuerpo: conversión rápida */}
+      <div className="p-3 space-y-2.5">
+        <AmountField label="Monto en Dólares (USD)" prefix="$" prefixClass="text-emerald-400" value={usdStr} onChange={syncFromUsd} darkMode={darkMode} />
+        <div className="flex items-center justify-center -my-0.5">
+          <span className="p-1 rounded-full bg-amber-500/15 text-amber-500">
+            <ArrowDownUp className="w-3 h-3" />
+          </span>
+        </div>
+        <AmountField label="Monto en Bolívares (Bs)" prefix="Bs" prefixClass="text-amber-400" value={bsStr} onChange={syncFromBs} darkMode={darkMode} />
+      </div>
+    </div>
   );
 }
 
-/* ---------------------------- CALCULADORA FULL ---------------------------- */
+/* ---------------------------- CALCULADORA COMPLETA ---------------------------- */
 function FullCalculator({ rate, darkMode, onClose }: { rate: number; darkMode: boolean; onClose: () => void }) {
   const [mode, setMode] = useState<Currency>('usd');
   const [entry, setEntry] = useState('');
@@ -275,7 +333,7 @@ function FullCalculator({ rate, darkMode, onClose }: { rate: number; darkMode: b
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex overflow-hidden animate-in fade-in duration-200" onClick={onClose}>
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex overflow-hidden animate-in duration-200" onClick={onClose}>
       <div
         className={`w-full h-full flex flex-col overflow-hidden md:max-w-sm md:h-[min(80vh,720px)] md:rounded-3xl md:m-auto md:border shadow-2xl glass-panel ${
           darkMode ? 'bg-[#0b0e14] border-slate-800' : 'bg-white border-slate-200'
@@ -349,13 +407,16 @@ function FullCalculator({ rate, darkMode, onClose }: { rate: number; darkMode: b
 export function TasaCalculator() {
   const { darkMode } = useTheme();
   const { rate } = useStore();
-  const [view, setView] = useState<View>('closed');
+  const [showMini, setShowMini] = useState(false);
+  const [showFull, setShowFull] = useState(false);
 
   return (
     <>
       <button
-        onClick={() => setView('mini')}
-        className="fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] md:bottom-8 right-4 md:right-8 z-40 flex items-center rounded-full bg-gradient-to-tr from-amber-500 via-orange-600 to-red-600 text-white shadow-2xl shadow-amber-500/40 hover:scale-105 active:scale-95 transition-all duration-200"
+        onClick={() => setShowMini((v) => !v)}
+        className={`fixed bottom-[calc(5rem+env(safe-area-inset-bottom))] md:bottom-8 right-4 md:right-8 z-40 flex items-center rounded-full bg-gradient-to-tr from-amber-500 via-orange-600 to-red-600 text-white shadow-2xl shadow-amber-500/40 hover:scale-105 active:scale-95 transition-all duration-200 ${
+          showMini ? 'ring-4 ring-amber-500/40' : ''
+        }`}
         aria-label="Calculadora de tasa"
       >
         <span className="relative w-14 h-14 rounded-full flex items-center justify-center">
@@ -367,8 +428,18 @@ export function TasaCalculator() {
         </span>
       </button>
 
-      {view === 'mini' && <MiniModal rate={rate} darkMode={darkMode} onClose={() => setView('closed')} onFull={() => setView('full')} />}
-      {view === 'full' && <FullCalculator rate={rate} darkMode={darkMode} onClose={() => setView('closed')} />}
+      {showMini && (
+        <MiniPanel
+          rate={rate}
+          darkMode={darkMode}
+          onClose={() => setShowMini(false)}
+          onFull={() => {
+            setShowMini(false);
+            setShowFull(true);
+          }}
+        />
+      )}
+      {showFull && <FullCalculator rate={rate} darkMode={darkMode} onClose={() => setShowFull(false)} />}
     </>
   );
 }

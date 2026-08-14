@@ -49,12 +49,13 @@ export function Header() {
 
         <div className="flex items-center gap-1.5 sm:gap-3">
           <div
-            className={`hidden lg:flex items-center gap-2.5 px-3.5 py-2 rounded-xl border text-xs font-bold ${darkMode ? 'bg-slate-900/60 border-slate-800 text-amber-400' : 'bg-amber-50 border-amber-200/80 text-amber-800'}`}
+            className={`flex items-center gap-2 px-2.5 sm:px-3.5 py-2 rounded-xl border text-xs font-bold whitespace-nowrap ${darkMode ? 'bg-slate-900/60 border-slate-800 text-amber-400' : 'bg-amber-50 border-amber-200/80 text-amber-800'}`}
           >
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <DollarSign className="w-4 h-4 text-amber-500" />
-            <span>
-              Tasa de la tienda: <strong>Bs. {rate.toFixed(2)}</strong>
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse hidden sm:block" />
+            <DollarSign className="w-4 h-4 text-amber-500 shrink-0" />
+            <span className="min-w-0">
+              <span className="hidden sm:inline">Tasa de la tienda: </span>
+              <strong>Bs. {rate.toFixed(2)}</strong>
             </span>
           </div>
 

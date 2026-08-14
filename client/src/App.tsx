@@ -23,7 +23,7 @@ function Layout() {
 
   return (
     <div
-      className={`min-h-screen w-full overflow-x-hidden font-sans antialiased transition-colors duration-300 selection:bg-amber-500 selection:text-slate-950 ${
+      className={`min-h-screen w-full overflow-x-clip font-sans antialiased transition-colors duration-300 selection:bg-amber-500 selection:text-slate-950 ${
         darkMode ? 'bg-[#07090e] text-slate-100' : 'bg-slate-50 text-slate-900'
       }`}
     >
