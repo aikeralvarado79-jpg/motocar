@@ -22,6 +22,20 @@ export function createApp(): express.Express {
     res.json({ ok: true, ts: Date.now() });
   });
 
+  // Versión del build desplegado → el cliente la usa para avisar actualizaciones
+  app.get('/api/version', (_req, res) => {
+    res.set('Cache-Control', 'no-store');
+    let version = 'dev';
+    try {
+      const raw = fs.readFileSync(config.buildInfoFile, 'utf8');
+      const parsed = JSON.parse(raw) as { ts?: string };
+      if (parsed.ts) version = parsed.ts;
+    } catch {
+      /* sin archivo de build (entornos de desarrollo) */
+    }
+    res.json({ version });
+  });
+
   app.use('/api/auth', authRouter());
   app.use('/api/products', productsRouter());
   app.use('/api/orders', ordersRouter());
@@ -36,9 +50,21 @@ export function createApp(): express.Express {
   // Cliente compilado (producción): sirve la SPA y cae al index.html
   const dist = config.clientDist;
   if (fs.existsSync(path.join(dist, 'index.html'))) {
-    app.use(express.static(dist));
+    app.use(
+      express.static(dist, {
+        setHeaders(res, filePath) {
+          if (filePath.endsWith('index.html')) {
+            // Obliga a revalidar: así "Actualizar" carga el HTML y los assets nuevos
+            res.setHeader('Cache-Control', 'no-cache');
+          } else if (filePath.endsWith('build_info.json')) {
+            res.setHeader('Cache-Control', 'no-store');
+          }
+        },
+      }),
+    );
     app.use((req, res, next) => {
       if (req.method === 'GET' && !req.path.startsWith('/api')) {
+        res.setHeader('Cache-Control', 'no-cache');
         res.sendFile(path.join(dist, 'index.html'));
         return;
       }

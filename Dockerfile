@@ -41,6 +41,9 @@ COPY --from=build /app/shared shared/
 COPY --from=build /app/server/src server/src/
 COPY --from=build /app/client/dist client/dist/
 
+# Huella única de versión por build → el cliente la detecta para avisar actualizaciones (PWA)
+RUN printf '{"ts":"%s"}' "$(date +%s%N)" > client/dist/build_info.json
+
 # Carpeta de datos persistente, accesible por todos
 RUN mkdir -p /data && chmod 777 /data
 

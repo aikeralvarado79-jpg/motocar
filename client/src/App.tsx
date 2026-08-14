@@ -1,6 +1,7 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { BottomNav } from './components/layout/BottomNav';
 import { Header } from './components/layout/Header';
+import { UpdateBanner } from './components/layout/UpdateBanner';
 import { AuthProvider } from './context/AuthContext';
 import { StoreProvider } from './context/StoreContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
@@ -29,6 +30,7 @@ function Layout() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1200px] h-[350px] bg-gradient-to-b from-amber-500/10 via-red-600/5 to-transparent blur-3xl pointer-events-none -z-10" />
 
       <Header />
+      <UpdateBanner />
 
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-8 pb-28 md:pb-16">
         <Outlet />
